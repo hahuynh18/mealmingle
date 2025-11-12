@@ -1,24 +1,5 @@
-# Node modules
-node_modules/
-
-# Environment variables
+node_modules
+# Keep environment variables out of version control
 .env
 
-# Google Cloud credentials
-*.json
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Uploaded files (temporary)
-uploads/
-
-# System files
-.DS_Store
-Thumbs.db
-
-testVision.js
+/generated/prisma
