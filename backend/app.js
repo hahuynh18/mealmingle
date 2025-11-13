@@ -6,7 +6,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json({ limit: "10mb" }));
-
 app.use("/api/vision", visionRouter);
 
 app.listen(PORT, () => {

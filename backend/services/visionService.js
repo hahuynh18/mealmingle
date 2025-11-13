@@ -18,13 +18,18 @@ export async function analyzeImage(base64Image) {
 
     const [result] = await client.annotateImage(request);
 
-    const labels =
-      result.labelAnnotations?.map((label) => label.description) || [];
+    const labelAnnotations =
+      result.labelAnnotations?.map((label) => ({
+        description: label.description,
+        score: label.score,
+      })) || [];
 
-    const texts = result.textAnnotations?.map((text) => text.description) || [];
+    const textAnnotations =
+      result.textAnnotations?.map((text) => text.description) || [];
 
-    const cleanText = (texts[0] || "").replace(/[\n"]/g, " ").trim();
-    return { labels, texts, cleanText };
+    const cleanText = (textAnnotations[0] || "").replace(/[\n"]/g, " ").trim();
+
+    return { labelAnnotations, textAnnotations, cleanText };
   } catch (err) {
     console.error("Error calling Vision API:", err);
     throw err;
