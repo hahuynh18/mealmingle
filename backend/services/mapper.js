@@ -1,3 +1,8 @@
+/**
+ * Maps Vision API labels to inventory items.
+ * Filters out overly generic labels, duplicates, and maps names to categories.
+ */
+
 export function mapVisionResultToInventoryItem(visionResult) {
   const {
     labelAnnotations = [],
@@ -7,45 +12,66 @@ export function mapVisionResultToInventoryItem(visionResult) {
 
   const quantities = extractQuantities(cleanText);
 
-  // Lọc label theo confidence và loại bỏ các label quá chung chung
+  const bannedLabels = [
+    "food",
+    "recipe",
+    "meal",
+    "cuisine",
+    "produce",
+    "tableware",
+    "furniture",
+    "container",
+    "kitchenware",
+    "ingredient",
+    "drink",
+    "beverage",
+    "dishware",
+    "utensil",
+    "packaging",
+    "cup",
+    "plate",
+    "dessert",
+    "glaze",
+    "finger food",
+    "baking",
+    "staple food",
+  ];
+
+  // Filter labels by confidence and remove overly general labels
   const filteredLabels = labelAnnotations.filter(
     (label) =>
-      label.score >= 0.8 && // chỉ lấy label >= 0.8 confidence
-      !["food", "recipe", "meal", "cuisine"].includes(
-        label.description.toLowerCase()
-      )
+      label.score >= 0.7 &&
+      !bannedLabels.includes(label.description.toLowerCase())
   );
 
-  // Map label thành inventory_item
+  // Map label to inventory_item
   const inventoryItems = filteredLabels.map((label) => {
     const name = label.description;
     const category = mapCategory(name);
     const quantity = quantities[name.toLowerCase()] || 1;
     const confidence = label.score;
-
     return { name, category, quantity, confidence };
   });
 
-  // Loại trùng lặp: nếu cùng name, giữ confidence cao nhất
-  const uniqueItems = [];
+  // Duplicate type: if same name, keep highest confidence
   const seen = new Map();
-
-  for (const item of inventoryItems) {
+  inventoryItems.forEach((item) => {
     const key = item.name.toLowerCase();
     if (!seen.has(key) || seen.get(key).confidence < item.confidence) {
       seen.set(key, item);
     }
-  }
+  });
 
   return Array.from(seen.values());
 }
 
 /**
- * Map tên item thành category (nâng cao)
+ * Map item name to category
+ * Check which category the label belongs to. If none match, default to 'other'.
  */
 function mapCategory(label) {
   if (!label) return "other";
-  const labelLower = label.toLowerCase().trim();
+  const l = label.toLowerCase();
 
   // Fruits
   const fruits = [
@@ -139,7 +165,7 @@ function mapCategory(label) {
     "wine",
   ];
 
-  // Dishes / prepared foods
+  // Dishes
   const dishes = [
     "pizza",
     "burger",
@@ -161,18 +187,30 @@ function mapCategory(label) {
     "pie",
   ];
 
+  const bannedLabels = [
+    "food",
+    "recipe",
+    "meal",
+    "cuisine",
+    "produce",
+    "tableware",
+    "furniture",
+    "container",
+    "kitchenware",
+  ];
+
   // Check which category it belongs to
-  if (fruits.some((f) => labelLower.includes(f))) return "fruit";
-  if (vegetables.some((v) => labelLower.includes(v))) return "vegetable";
-  if (ingredients.some((i) => labelLower.includes(i))) return "ingredient";
-  if (beverages.some((b) => labelLower.includes(b))) return "beverage";
-  if (dishes.some((d) => labelLower.includes(d))) return "dish";
+  if (fruits.some((f) => l.includes(f))) return "fruit";
+  if (vegetables.some((v) => l.includes(v))) return "vegetable";
+  if (ingredients.some((i) => l.includes(i))) return "ingredient";
+  if (beverages.some((b) => l.includes(b))) return "beverage";
+  if (dishes.some((d) => l.includes(d))) return "dish";
 
   return "other";
 }
 
 /**
- * Extract quantity từ cleanText
+ * Extract quantity from cleanText
  */
 function extractQuantities(text) {
   const result = {};
