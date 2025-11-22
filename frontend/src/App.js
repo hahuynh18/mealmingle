@@ -1,14 +1,13 @@
-import logo from './logo.svg';
 import './App.css';
-import Inventory from './pages/Inventory';
+import Pantry from './pages/Pantry';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <Inventory />
-      </header>
-    </div>
+    <header className="App-header">
+      <div className="App">
+        <Pantry />
+      </div>
+    </header>
   );
 }
 
