@@ -1,7 +1,7 @@
 /**
  * Defines the Express router for handling image uploads.
  * uses Multer for file processing and orchestrates the workflow:
- * file upload -> conversion -> call to visionService -> response, ensuring
+ * file upload -> conversion -> call to visionService -> DB Save -> response, ensuring
  * temp file is deleted when complete.
  */
 
@@ -12,6 +12,7 @@ import { fileToBuffer } from "../utilities/utilities.js";
 import { promises as fs } from "fs";
 import { analyzeImage } from "../services/visionService.js";
 import { mapVisionResultToInventoryItem } from "../services/mapper.js";
+import { saveScannedItems } from "../services/inventoryService.js";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" }); // Multer saves files to a temp 'uploads' directory
@@ -55,11 +56,17 @@ router.post("/scan", upload.single("inventoryImage"), async (req, res) => {
     // Map Vision API result -> inventory items
     const inventoryItems = mapVisionResultToInventoryItem(visionResult);
 
-    // 4. Send the raw results back to the client
+    // 4. Save the mapped items to the database
+    // NOTE: Using a temporary default user ID until an Auth system is in place.
+    const DEFAULT_USER_ID = process.env.DEFAULT_USER_ID || "test-user-001";
+    await saveScannedItems(DEFAULT_USER_ID, inventoryItems);
+    
+    // 5. Send the raw results back to the client
     res.status(200).json({
       message:
-        "Image successfully analyzed by AI. Mapped inventory items below:",
+        "Image successfully analyzed and items saved to database.",
       inventoryItems,
+      userId: DEFAULT_USER_ID,
     });
   } catch (error) {
     // Log the error internally and return a generic 500
@@ -68,6 +75,8 @@ router.post("/scan", upload.single("inventoryImage"), async (req, res) => {
     // Provide a clearer error message if the API key/creds were the issue
     const errorMessage = error.message.includes("Vision API failed")
       ? "Failed to connect to or process data with the Vision API. Check credentials and API key/auth."
+      : error.message.includes("database error")
+      ? "Failed to save data to the database. Check logs for connection issues."
       : "Failed to process image. Internal server error.";
 
     res.status(500).json({ error: errorMessage });
