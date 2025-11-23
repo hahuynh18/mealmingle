@@ -6,10 +6,9 @@
 import { PrismaClient } from '@prisma/client';
 import "dotenv/config"; // Ensure .env variables are loaded for the DATABASE_URL
 
-// Initialize PrismaClient
-const prisma = new PrismaClient({
+// Initialize PrismaClient and export it as a named export.
+// This is often more reliable than a default export in Node.js.
+export const prisma = new PrismaClient({
   // Optional: Add logging to see the SQL queries Prisma executes
   log: ['query', 'info', 'warn', 'error'],
 });
-
-export default prisma;
