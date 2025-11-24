@@ -2,9 +2,9 @@ import { createSlice, nanoid } from '@reduxjs/toolkit';
 
 const initialState = {
     items: [
-        {ID: '1', ProductID: '101', Quantity: 2.8, Unit: 'kg', Expiration: '2024-12-31', AddedDate: '2024-06-01'},
-        {ID: '2', ProductID: '102', Quantity: 1.5, Unit: 'L', Expiration: '2024-11-15', AddedDate: '2024-06-05'},
-        {ID: '3', ProductID: '103', Quantity: 12, Unit: 'pcs', Expiration: '2025-01-10', AddedDate: '2024-06-10'}
+        {id: '1', productID: '101', quantity: 2.8, unit: 'kg', expiration: '2024-12-31', addedDate: '2024-06-01'},
+        {id: '2', productID: '102', quantity: 1.5, unit: 'L', expiration: '2024-11-15', addedDate: '2024-06-05'},
+        {id: '3', productID: '103', quantity: 12, unit: 'pcs', expiration: '2025-01-10', addedDate: '2024-06-10'}
     ],
     status: 'idle',
     error: null
@@ -23,9 +23,11 @@ const pantryListSlice = createSlice({
                     payload: {
                         id: nanoid(),
                         name,
+                        productID: '',
                         quantity,
                         unit,
                         expiration,
+                        addedDate: new Date().toISOString().split('T')[0],
                         selected: false
                     }
                 };
