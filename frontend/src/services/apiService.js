@@ -11,16 +11,6 @@
  *   - updateInventory(id, data)
  */
 
-/**
- * Sends an image to the backend for inventory scanning.
- *
- * @async
- * @function scanInventoryImage
- * @param {File} file - The image file captured or uploaded by the user.
- * @returns {Promise<Object>} The parsed JSON response containing detected inventory items.
- * @throws {Error} If the scan request fails or the server returns a non-OK status.
- */
-
 export const scanInventoryImage = async (file) => {
   const formData = new FormData();
   formData.append("inventoryImage", file);
