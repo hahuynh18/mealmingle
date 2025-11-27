@@ -1,9 +1,11 @@
 import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, removeItem, updateItem } from './pantryListSlice';
 
 const PantryList = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const items = useSelector((state) => state.pantryList.items);
 
     const columns = [
@@ -31,8 +33,8 @@ const PantryList = () => {
         dispatch(removeItem(id));
     };
 
-    const handleUpdateItem = (id, key, value) => {
-        dispatch(updateItem({ id, changes: { [key]: value } }));
+    const handleUpdateItem = (id) => {
+        navigate(`/edit/${id}`);
     };
 
     // IMAGE HANDLING FUNCTIONS
@@ -105,17 +107,14 @@ const PantryList = () => {
                         <tr key={item.id}>
                             {columns.map((col) => (
                                 <td key={col.key}>
-                                    <input
-                                        type="text"
-                                        value={item[col.key] || ''}
-                                        onChange={(e) =>
-                                            handleUpdateItem(item.id, col.key, e.target.value)
-                                        }
-                                    />
+                                    <div>
+                                        {item[col.key] || ''}
+                                    </div>
                                 </td>
                             ))}
                             <td>
                                 <button onClick={() => handleRemoveItem(item.id)}>Remove</button>
+                                <button onClick={() => handleUpdateItem(item.id)}>Update</button>
                             </td>
                         </tr>
                     ))}
