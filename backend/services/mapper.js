@@ -35,6 +35,11 @@ export function mapVisionResultToInventoryItem(visionResult) {
     "finger food",
     "baking",
     "staple food",
+    "bowl",
+    "cutting board",
+    "kitchen utensil",
+    "breakfast",
+    "fast food",
   ];
 
   // Filter labels by confidence and remove overly general labels

@@ -5,11 +5,11 @@
  */
 import express from "express";
 import bodyParser from "body-parser";
-import { prisma } from "./prismaClient.js"; 
+import { prisma } from "./prismaClient.js";
 import imageUploadRoute from "./routes/imageUploadRoute.js"; // import the new upload route
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -43,12 +43,16 @@ app.listen(PORT, async () => {
       error.message;
 
     console.error("Error Details:", message);
-    
+
     // Suggest specific troubleshooting steps
     if (message.includes("Authentication failed")) {
-      console.log("HINT: Check your DATABASE_URL username and password in the .env file.");
+      console.log(
+        "HINT: Check your DATABASE_URL username and password in the .env file."
+      );
     } else if (message.includes("Could not resolve host")) {
-      console.log("HINT: Check the database hostname/proxy and port in the .env file.");
+      console.log(
+        "HINT: Check the database hostname/proxy and port in the .env file."
+      );
     }
   }
 });
