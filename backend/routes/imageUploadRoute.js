@@ -12,7 +12,7 @@ import { fileToBuffer } from "../utilities/utilities.js";
 import { promises as fs } from "fs";
 import { analyzeImage } from "../services/visionService.js";
 import { mapVisionResultToInventoryItem } from "../services/mapper.js";
-import { saveScannedItems } from "../services/inventoryService.js";
+// import { saveScannedItems } from "../services/inventoryService.js";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" }); // Multer saves files to a temp 'uploads' directory
@@ -58,15 +58,15 @@ router.post("/scan", upload.single("inventoryImage"), async (req, res) => {
 
     // 4. Save the mapped items to the database
     // NOTE: Using a temporary default user ID until an Auth system is in place.
-    const DEFAULT_USER_ID = process.env.DEFAULT_USER_ID || "test-user-001";
-    await saveScannedItems(DEFAULT_USER_ID, inventoryItems);
+    //const DEFAULT_USER_ID = process.env.DEFAULT_USER_ID || "test-user-001";
+    // await saveScannedItems(DEFAULT_USER_ID, inventoryItems);
     
     // 5. Send the raw results back to the client
     res.status(200).json({
       message:
         "Image successfully analyzed and items saved to database.",
       inventoryItems,
-      userId: DEFAULT_USER_ID,
+      // userId: DEFAULT_USER_ID,
     });
   } catch (error) {
     // Log the error internally and return a generic 500
