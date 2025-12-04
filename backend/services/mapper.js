@@ -53,14 +53,31 @@ export function mapVisionResultToInventoryItem(visionResult) {
   const inventoryItems = filteredLabels.map((label) => {
     const name = label.description;
     const category = mapCategory(name);
-    const quantity = quantities[name.toLowerCase()] || 1;
+
+    const nameLower = name.toLowerCase();
+
+    let quantity = quantities[nameLower];
+    if (quantity === undefined){
+      quantity = quantities[nameLower + 's'];
+    }
+
+    if (quantity === undefined){
+      quantity = 1;
+    }
+
+
     const confidence = label.score;
     return { name, category, quantity, confidence };
   });
 
+  //aggressively filter out item that failed to map to a specific category (i.e., 'other')
+  const categorizedItems = inventoryItems.filter(
+    (item) => item.category !== "other"
+  );
+
   // Duplicate type: if same name, keep highest confidence
   const seen = new Map();
-  inventoryItems.forEach((item) => {
+  categorizedItems.forEach((item) => {
     const key = item.name.toLowerCase();
     if (!seen.has(key) || seen.get(key).confidence < item.confidence) {
       seen.set(key, item);
@@ -77,6 +94,44 @@ export function mapVisionResultToInventoryItem(visionResult) {
 function mapCategory(label) {
   if (!label) return "other";
   const l = label.toLowerCase();
+
+  // Dishes
+  const dishes = [
+    "pizza",
+    "burger",
+    "sandwich",
+    "pasta",
+    "sushi",
+    "taco",
+    "salad",
+    "cake",
+    "cookies",
+    "bread",
+    "noodles",
+    "soup",
+    "curry",
+    "omelette",
+    "pancake",
+    "waffle",
+    "stew",
+    "pie",
+  ];
+
+    // Beverages
+  const beverages = [
+    "milk",
+    "coffee",
+    "tea",
+    "water",
+    "juice",
+    "soda",
+    "coke",
+    "pepsi",
+    "lemonade",
+    "smoothie",
+    "beer",
+    "wine",
+  ];
 
   // Fruits
   const fruits = [
@@ -154,43 +209,7 @@ function mapCategory(label) {
     "shrimp",
   ];
 
-  // Beverages
-  const beverages = [
-    "milk",
-    "coffee",
-    "tea",
-    "water",
-    "juice",
-    "soda",
-    "coke",
-    "pepsi",
-    "lemonade",
-    "smoothie",
-    "beer",
-    "wine",
-  ];
 
-  // Dishes
-  const dishes = [
-    "pizza",
-    "burger",
-    "sandwich",
-    "pasta",
-    "sushi",
-    "taco",
-    "salad",
-    "cake",
-    "cookies",
-    "bread",
-    "noodles",
-    "soup",
-    "curry",
-    "omelette",
-    "pancake",
-    "waffle",
-    "stew",
-    "pie",
-  ];
 
   const bannedLabels = [
     "food",
@@ -202,6 +221,7 @@ function mapCategory(label) {
     "furniture",
     "container",
     "kitchenware",
+    "cup",
   ];
 
   // Check which category it belongs to
