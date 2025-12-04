@@ -7,6 +7,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { prisma } from "./prismaClient.js";
 import imageUploadRoute from "./routes/imageUploadRoute.js"; // import the new upload route
+import inventoryRoutes from "./routes/inventoryRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //register image Upload/Scan route
 //prefixing with /api/v1/inventory, but the router handles the /scan part
 app.use("/api/v1/inventory", imageUploadRoute);
+app.use("/api/v1/inventory", inventoryRoutes);
 
 app.get("/", (req, res) => {
   res.send("MealMingle Backend Service Running.");
